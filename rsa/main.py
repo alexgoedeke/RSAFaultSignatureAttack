@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # created on 10.02.2016 by Alexander Goedeke
 
+from random import randint
+
 # use test values for RSA
 p, q, n, e, d = 593, 487, 288791, 5, 115085
 
@@ -48,10 +50,21 @@ def crt(a1, a2):
 def sig(h):
     return crt(h, h)
 
+# bitflip
+def bitflip(h):
+    i = "{0:b}".format(h)
+    li = list(i)
+    k = randint(0, len(i) - 1)
+    if li[k] == '0':
+        li[k] = '1'
+    else:
+        li[k] = '0'
+    return int(''.join(li), 2)
+
 
 # sign h with an bit manipulation
 def fsig(h):
-    return crt(h, h + 1)
+    return crt(h, bitflip(h))
 
 
 def main():
