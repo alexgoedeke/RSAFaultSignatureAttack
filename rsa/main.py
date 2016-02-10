@@ -37,7 +37,7 @@ def power(a, b, m):
 def crt(a1, a2):
     dp = d % (p - 1)
     dq = d % (q - 1)
-    iq = inv(q, p) + p
+    iq = inv(q, p)
     sp = power(a1, dp, p)
     sq = power(a2, dq, q)
     s = sq + q * (iq * (sp - sq) % p)
