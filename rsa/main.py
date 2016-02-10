@@ -57,7 +57,7 @@ def main():
 
     p1, p2, p3 = gcd(n, s1 - s2)
     if p1 == p:
-        print "found private key: ("+str(p1)+", "+str(n/p1)+")"
+        print "found private key: (" + str(p1) + ", " + str(n / p1) + ")"
 
     return 0
 
