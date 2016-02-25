@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # created on 10.02.2016 by Alexander Goedeke
+# only works for RSA-keys up to 2048 bit
 
 from random import randint
 import os
@@ -10,9 +11,9 @@ HEX = 1
 
 
 # read private key file (a=1: generate new openssl rsa key)
-def generateKey(a):
+def generateKey(a, b):
     if a == 1:
-        os.system("openssl genrsa -out private.key")
+        os.system(("openssl genrsa -out private.key "+ str(b)))
         os.system("openssl rsa -in private.key -text > private.txt")
 
     global p, q, n, e, d
@@ -161,8 +162,11 @@ def main():
         elif i == 4:
             print "\n--------------------------------------------- generate real key --------------------------------------------"
             i4 = input("(1) use old files, (2) generate new: ")
+            b = 0
+            if i4 == 2:
+                b = input("key size: ")
             if 1 <= i4 <= 2:
-                generateKey(i4-1)
+                generateKey(i4-1, b)
             print "------------------------------------------------------------------------------------------------------------\n"
         else:
             exit(0)
