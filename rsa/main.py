@@ -154,6 +154,4 @@ def main():
             generateKey(0)
         else:
             break
-
-
 main()
