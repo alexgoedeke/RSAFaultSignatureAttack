@@ -106,7 +106,7 @@ h = 0
 def main():
     while 1:
         print "\n--------------------------------------------------- MENU ---------------------------------------------------"
-        i = input("(1) generate signature, (2) generate fault signature, (3) do fault attack, (4) generate real key, (5) exit: ")
+        i = input("(1) generate signature, (2) generate fault signature, (3) do fault attack\n(4) generate real key, (5) print private key, (6) exit: ")
         print "------------------------------------------------------------------------------------------------------------\n"
         global sig_ok
         global sig_fault
@@ -139,9 +139,9 @@ def main():
                     p1, p2, p3 = gcd(n, sig_ok - sig_fault)
                     if p1 == p:
                         if HEX == 1:
-                            print "found private key: (" + str(hex(p1)) + ", " + str(hex(n / p1)) + ")"
+                            print "found private key: (p:" + str(hex(p1)) + ", q:" + str(hex(n / p1)) + ")"
                         else:
-                            print "found private key: (" + str(p1) + ", " + str(n / p1) + ")"
+                            print "found private key: (p:" + str(p1) + ", q:" + str(n / p1) + ")"
                     else:
                         print "no private key computed :("
                 else:
@@ -151,9 +151,9 @@ def main():
                     p1, p2, p3 = gcd(n, power(sig_fault, e, n) - h)
                     if p1 == p:
                         if HEX == 1:
-                            print "found private key: (" + str(hex(p1)) + ", " + str(hex(n / p1)) + ")"
+                            print "found private key: (p:" + str(hex(p1)) + ", q:" + str(hex(n / p1)) + ")"
                         else:
-                            print "found private key: (" + str(p1) + ", " + str(n / p1) + ")"
+                            print "found private key: (p:" + str(p1) + ", q:" + str(n / p1) + ")"
                     else:
                         print "no private key computed :("
                 else:
@@ -167,6 +167,15 @@ def main():
                 b = input("key size: ")
             if 1 <= i4 <= 2:
                 generateKey(i4-1, b)
+            print "------------------------------------------------------------------------------------------------------------\n"
+        elif i == 5:
+            print "\n--------------------------------------------- print private key --------------------------------------------"
+            if HEX == 1:
+                print "private key: (p:" + str(hex(p)) + ", q:" + str(hex(q)) + ")"
+                print "             (e:" + str(hex(e)) + ", d:" + str(hex(d)) + ")"
+            else:
+                print "private key: (p:" + str(p) + ", q:" + str(q) + ")"
+                print "             (e:" + str(e) + ", d:" + str(d) + ")"
             print "------------------------------------------------------------------------------------------------------------\n"
         else:
             exit(0)
