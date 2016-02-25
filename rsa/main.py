@@ -5,12 +5,13 @@ from random import randint
 import os
 
 # use test values for RSA
-#p, q, n, e, d = 593, 487, 288791, 5, 115085
-p, q, n, e, d = 0, 0, 0, 0, 0
+p, q, n, e, d = 11, 13, 143, 23, 47
+HEX = 1
+
 
 # read private key file (a=1: generate new openssl rsa key)
 def generateKey(a):
-    if a==1:
+    if a == 1:
         os.system("openssl genrsa -out private.key")
         os.system("openssl rsa -in private.key -text > private.txt")
 
@@ -26,11 +27,11 @@ def generateKey(a):
     i_q = text.find("prime2")
     i_end = text.find("exponent1")
 
-    n = int(text[ i_n + 7: i_e].translate(None, ': \n'), 16)
-    e = int(text[ i_e + 16: i_e+21])
-    d = int(text[ i_d + 15: i_p].translate(None, ': \n'), 16)
-    p = int(text[ i_p + 6: i_q].translate(None, ': \n'), 16)
-    q = int(text[ i_q + 6: i_end].translate(None, ': \n'), 16)
+    n = int(text[i_n + 7: i_e].translate(None, ': \n'), 16)
+    e = int(text[i_e + 16: i_e + 21])
+    d = int(text[i_d + 15: i_p].translate(None, ': \n'), 16)
+    p = int(text[i_p + 6: i_q].translate(None, ': \n'), 16)
+    q = int(text[i_q + 6: i_end].translate(None, ': \n'), 16)
 
     f.close()
 
@@ -56,7 +57,7 @@ def inv(a, m):
 # a^b mod m
 def power(a, b, m):
     result = 1
-    for bit in "{0:b}".format(b):
+    for bit in bin(b)[2:]:
         result = (result ** 2) % m
         if bit == "1":
             result = (result * a) % m
@@ -81,7 +82,7 @@ def sig(h):
 
 # bitflip
 def bitflip(h):
-    i = "{0:b}".format(h)
+    i = bin(h)[2:]
     li = list(i)
     k = randint(0, len(i) - 1)
     if li[k] == '0':
@@ -96,34 +97,63 @@ def fsig(h):
     return crt(h, bitflip(h))
 
 
+sig_ok = 0
+sig_fault = 0
+h = 0
+
+
 def main():
-    generateKey(0)
+    while 1:
+        i = input("(1) generate signature, (2) generate fault signature, (3) do fault attack, (4) generate real key, (5) exit: ")
+        global sig_ok
+        global sig_fault
+        global h
 
-    # read plaintext dec
-    h = int(input("plaintext: "))
+        if i == 1:
+            h = input("message: ")
+            sig_ok = sig(h)
 
-    # read plaintext hex
-    # h = int(input("plaintext: "), 16)
-
-    # generate signatures
-    s1 = sig(h)
-    s2 = fsig(h)
-
-    # print signatures
-    print "sig(" + str(h) + ") = " + str(s1)
-    print "fsig(" + str(h) + ") = " + str(s2)
-
-    # do the fault signature attack
-    # we know that s1 is an correct and s2 an incorrect signature
-    p1, p2, p3 = gcd(n, s1 - s2)
-    if p1 == p:
-        print "found private key (1): (" + str(p1) + ", " + str(n / p1) + ")"
-
-    p1, p2, p3 = gcd(n, power(s2, e, n) - h)
-    if p1 == p:
-        print "found private key (2): (" + str(p1) + ", " + str(n / p1) + ")"
-
-    return 0
+            if HEX == 1:
+                print "signature: " + str(hex(sig_ok))
+            else:
+                print "signature: " + str(sig_ok)
+        elif i == 2:
+            h = input("message: ")
+            sig_fault = fsig(h)
+            if HEX == 1:
+                print "signature: " + str(hex(sig_fault))
+            else:
+                print "signature: " + str(sig_fault)
+        elif i == 3:
+            i2 = input("(1) knows s and sf, (2) known sf and h: ")
+            if i2 == 1:
+                if (sig_ok != 0) & (sig_fault != 0):
+                    p1, p2, p3 = gcd(n, sig_ok - sig_fault)
+                    if p1 == p:
+                        if HEX == 1:
+                            print "found private key: (" + str(hex(p1)) + ", " + str(hex(n / p1)) + ")"
+                        else:
+                            print "found private key: (" + str(p1) + ", " + str(n / p1) + ")"
+                    else:
+                        print "no private key computed :("
+                else:
+                    print "not enough data"
+            elif i2 == 2:
+                if (h != 0) & (sig_fault != 0):
+                    p1, p2, p3 = gcd(n, power(sig_fault, e, n) - h)
+                    if p1 == p:
+                        if HEX == 1:
+                            print "found private key: (" + str(hex(p1)) + ", " + str(hex(n / p1)) + ")"
+                        else:
+                            print "found private key: (" + str(p1) + ", " + str(n / p1) + ")"
+                    else:
+                        print "no private key computed :("
+                else:
+                    print "not enough data"
+        elif i == 4:
+            generateKey(0)
+        else:
+            break
 
 
 main()
